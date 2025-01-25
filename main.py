@@ -1,43 +1,69 @@
-import random
-import time
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import algo
 import numpy as np
 
 
+def get_integer_input(prompt, default=None, min_value=None, max_value=None):
+    """
+    Prompts the user for an integer input with validation and default handling.
+    """
+    while True:
+        user_input = input(f"{prompt} (default: {default}): ").strip()
+        if not user_input and default is not None:
+            return default
+        try:
+            value = int(user_input)
+            if (min_value is not None and value < min_value) or (max_value is not None and value > max_value):
+                print(f"Please enter a value between {min_value} and {max_value}.")
+                continue
+            return value
+        except ValueError:
+            print("Invalid input. Please enter a valid integer.")
+
+def get_sorting_method():
+    """
+    Prompts the user to select a sorting method with validation.
+    """
+    methods = {
+        "b": "Bubble sort",
+        "i": "Insertion sort",
+        "m": "Merge sort",
+        "q": "Quicksort",
+        "s": "Selection sort"
+    }
+    print("Choose a sorting method:")
+    for key, name in methods.items():
+        print(f"  ({key}) {name}")
+    
+    while True:
+        method = input("Enter your choice: ").strip().lower()
+        if method in methods:
+            return method, methods[method]
+        print("Invalid choice. Please choose a valid sorting method.")
+
+
 if __name__ == "__main__":
     # Get user input to determine range of integers (1 to N) and desired
-    N = int(input("Enter number of integers: "))
-    method_msg = "Enter sorting method:\n(b)ubble\n(i)nsertion\n(m)erge \
-        \n(q)uick\n(s)election\n"
-    method = input(method_msg)
+    # Get user inputs with validation
+    N = get_integer_input("Enter the number of integers to sort", default=50, min_value=2, max_value=500)
+    method, title = get_sorting_method()
 
-    # Build and randomly shuffle list of integers.
-    """
-    A = [x + 1 for x in range(N)]
-    random.seed(time.time())
-    random.shuffle(A)
+    # Build and shuffle the list of integers
+    A = np.random.randint(1, 2 * N, N)
 
-    """
-    A= np.random.randint(1,2*N,N)
-
-    # Get appropriate generator to supply to matplotlib FuncAnimation method.
+    # Get the appropriate generator
     if method == "b":
-        title = "Bubble sort"
         generator = algo.bubblesort(A)
     elif method == "i":
-        title = "Insertion sort"
         generator = algo.insertionsort(A)
     elif method == "m":
-        title = "Merge sort"
         generator = algo.mergesort(A, 0, N - 1)
     elif method == "q":
-        title = "Quicksort"
         generator = algo.quicksort(A, 0, N - 1)
     else:
-        title = "Selection sort"
         generator = algo.selectionsort(A)
+
 
     # Initialize figure and axis.
     fig, ax = plt.subplots()
@@ -72,11 +98,13 @@ if __name__ == "__main__":
     def update_fig(A, rects, iteration):
         for rect, val in zip(rects, A):
             rect.set_height(val)
+            rect.set_color(plt.cm.viridis(val / max(A)))  # Update bar color dynamically
         iteration[0] += 1
-        text.set_text("# of operations: {}".format(iteration[0]))
+        text.set_text(f"# of operations: {iteration[0]}")
 
+    # Animation
     anim = animation.FuncAnimation(
         fig, func=update_fig, fargs=(bar_rects, iteration),
-        frames=generator, interval=1, repeat=False, cache_frame_data=False
+        frames=generator, interval=200, repeat=False, cache_frame_data=False
     )
     plt.show()

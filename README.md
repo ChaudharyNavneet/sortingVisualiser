@@ -18,7 +18,9 @@ Ensure you have the following installed on your system:
 - Required Python libraries:
   - `matplotlib`
   - `numpy`
-
+  
 You can install the required libraries with:
 ```bash
 pip install matplotlib numpy
+```
+**colab** : https://colab.research.google.com/drive/10kqxozf6bM7KamzTT-0AX74RTyHHHfOh?usp=sharing
